@@ -1,0 +1,29 @@
+version: "3"
+
+networks:
+    broker-communication:
+
+services:
+    mqtt-broker:
+        image: eclipse-mosquitto:latest
+        networks:
+            - broker-communication
+        ports:
+            - 1883:1883
+
+    client:
+        build: ./client
+        depends_on:
+            - mqtt-broker
+        networks:
+            - broker-communication
+        tty: true
+        stdin_open: true
+
+    server:
+        build: ./server
+        depends_on:
+            - mqtt-broker
+        networks:
+            - broker-communication
+        tty: true
