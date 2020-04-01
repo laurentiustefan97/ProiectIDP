@@ -1,9 +1,10 @@
 import paho.mqtt.client as mqtt
 import socket
+import json
 
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
+    print('Connected with result code ' + str(rc))
 
 
 def init_mqtt_client():
@@ -16,31 +17,65 @@ def connect_mqtt_broker(mqtt_client):
     while True:
         try:
             # Connect to the mqtt broker on port 1883
-            mqtt_client.connect("mqtt-broker", 1883, 60)
+            mqtt_client.connect('mqtt-broker', 1883, 60)
         except socket.gaierror:
-            print("Failed to connect to mqtt broker!")
+            print('Failed to connect to mqtt broker!')
             continue
         break
 
 
 def add_expenditure(mqtt_client):
     print('Introduce the product category')
-    category = input()
+    while True:
+        category = input()
+
+        if category.isalpha():
+            break
+
+        print('Category must contain only letters!')
 
     print('Introduce the user name')
     username = input()
 
     print('Introduce the product name')
-    product_name = input()
+    while True:
+        product_name = input()
+
+        if product_name.isalpha():
+            break
+
+        print('Product name must contain only letters!')
 
     print('Introduce the product price')
-    product_price = input()
+    while True:
+        product_price = input()
 
+        if product_price.isdigit():
+            break
+
+        print('Product price should contain only digits!')
+
+    # Later TODO modify the date format in order
+    # to be consistent with the DB format
     print('Introduce the expenditure date')
     date = input()
 
-    # TODO send over the MQTT client a json with the data
-    mqtt_client.publish("IDP", "todo")
+    print('Introduce the expenditure description')
+    description = input()
+
+    # Create a dictionary with the data received
+    payload = {
+        'category': category,
+        'username': username,
+        'product_name': product_name,
+        'product_price': product_price,
+        'date': date,
+        'description': description,
+    }
+
+    # Send over the broker on the /add channel
+    # a JSON with the data received as a dictionary
+    mqtt_client.publish('expenditure/add', json.dumps(payload))
 
 
 def main():
