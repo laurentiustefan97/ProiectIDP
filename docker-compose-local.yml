@@ -12,7 +12,7 @@ services:
             - 1883:1883
 
     client:
-        image: laurentiustefan97/idp:client
+        build: ./client
         depends_on:
             - mqtt-broker
         networks:
@@ -21,7 +21,7 @@ services:
         stdin_open: true
 
     server:
-        image: laurentiustefan97/idp:server
+        build: ./server
         depends_on:
             - mqtt-broker
         networks:
