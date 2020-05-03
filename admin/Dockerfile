@@ -1,5 +1,7 @@
 FROM python:3.6
 
+EXPOSE 5001
+
 WORKDIR /admin
 
 COPY requirements.txt /admin

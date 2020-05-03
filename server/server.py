@@ -1,11 +1,20 @@
 import paho.mqtt.client as mqtt
 import json
+import socket
+import time
+
+# Constants
+
+ADMIN_SERVICE = "admin"
+ADMIN_PORT = 5001
+
+# The socket used for the communication with the admin
+admin_sock = None
 
 
 def on_connect(mqtt_client, userdata, flags, rc):
     print('Connected with result code ' + str(rc) + '\n')
 
-    # TODO subscribe to a specific channel
     mqtt_client.subscribe('expenditure/#')
 
 
@@ -51,8 +60,22 @@ def connect_mqtt_broker(mqtt_client):
     mqtt_client.loop_forever()
 
 
+def connect_socket():
+    global admin_sock
+
+    admin_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    admin_sock.connect((ADMIN_SERVICE, ADMIN_PORT))
+
+
 def main():
-    # Wait for the environment completion
+    # TODO change the sleep
+    time.sleep(3)
+
+    # Connect to the admin service
+    connect_socket()
+
+    admin_sock.send(b'ceva')
+
     mqtt_client = init_mqtt_client()
 
     connect_mqtt_broker(mqtt_client)

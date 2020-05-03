@@ -3,6 +3,7 @@ version: "3"
 networks:
     broker-communication:
     admin-db:
+    admin-server:
 
 services:
     mqtt-broker:
@@ -21,23 +22,30 @@ services:
         tty: true
         stdin_open: true
 
+    # TODO solve dependency to admin
     server:
         build: ./server
         depends_on:
             - mqtt-broker
+            - admin
         networks:
             - broker-communication
+            - admin-server
         # REMOVE ME
         tty: true
 
+    # TODO solve dependency to database
     admin:
         build: ./admin
         depends_on:
             - database
         networks:
             - admin-db
+            - admin-server
         tty: true
         stdin_open: true
+        ports:
+            - "5001:5001"
 
     database:
         image: mysql:5.7
