@@ -2,6 +2,7 @@ version: "3"
 
 networks:
     broker-communication:
+    admin-db:
 
 services:
     mqtt-broker:
@@ -29,6 +30,15 @@ services:
         # REMOVE ME
         tty: true
 
+    admin:
+        build: ./admin
+        depends_on:
+            - database
+        networks:
+            - admin-db
+        tty: true
+        stdin_open: true
+
     database:
         image: mysql:5.7
         volumes:
@@ -40,3 +50,5 @@ services:
             MYSQL_PASSWORD: my_password
         ports:
             - "32000:3306"
+        networks:
+            - admin-db
