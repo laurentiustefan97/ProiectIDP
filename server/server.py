@@ -1,5 +1,4 @@
 import paho.mqtt.client as mqtt
-import json
 import socket
 import time
 
@@ -19,24 +18,25 @@ def on_connect(mqtt_client, userdata, flags, rc):
 
 
 def process_add(payload):
+    global admin_sock
+
     print('The operation received is add!')
     print('The payload is ' + str(payload))
-    print('Now I will have to send it to the database admin!')
+
+    # Sending the json string to the admin
+    admin_sock.send(payload)
 
 
 # The callback for when a PUBLISH message is received from an IOT device
 def on_message(mqtt_client, userdata, msg):
     print('Received a message on the topic [' + msg.topic + ']')
 
-    # Get the payload from the json received
-    payload = json.loads(msg.payload)
-
     # Take the name of the operation after 'expenditure/'
     operation = msg.topic.split('/')[1]
 
     # Process the requested operation
     if operation == 'add':
-        process_add(payload)
+        process_add(msg.payload)
 
 
 def init_mqtt_client():
@@ -74,10 +74,10 @@ def main():
     # Connect to the admin service
     connect_socket()
 
-    admin_sock.send(b'ceva')
-
+    # Create the mqtt client
     mqtt_client = init_mqtt_client()
 
+    # Connect to the mqtt broker
     connect_mqtt_broker(mqtt_client)
 
 

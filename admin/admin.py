@@ -1,5 +1,7 @@
 import mysql.connector
 import socket
+import json
+import threading
 
 # Constants
 
@@ -45,13 +47,19 @@ def accept_connection(listen_sock):
     print('Waiting for requests...')
 
     while True:
-        payload = admin_sock.recv(PAYLOAD_SIZE)
-        if not payload:
+        # We only receive packages as jsons
+        json_payload = admin_sock.recv(PAYLOAD_SIZE)
+        if not json_payload:
             break
-        print('Received the payload ' + str(payload))
+
+        json_payload = json.loads(json_payload)
+
+        print('Received the payload ' + str(json_payload))
 
 
 def main():
+    global db_connection, db_cursor
+
     # The listener socket used for the admin connection
     listen_sock = create_listen_socket()
 
@@ -60,9 +68,29 @@ def main():
 
     db_connect()
 
-    # TODO create a thread that communicates with the admin, and the current
-    # thread deals with CLI commands
-    accept_connection(listen_sock)
+    communication_thread = threading.Thread(target=accept_connection, args=listen_sock)
+
+    print('--------------------------------------------------------')
+    print('Welcome to the expenditure database administration!')
+    print('--------------------------------------------------------')
+
+    while True:
+        print()
+        print('----------------------------------------------------')
+        print('Introduce the desired operation:')
+        print('[1]: Add expenditure!')
+        print('[2]: Delete expenditure!')
+        print('[3]: List expenditures!')
+        print('[4]: Exit the plane flights database administration!')
+        print('----------------------------------------------------')
+
+        operation = input()
+
+        if operation == '4':
+            break
+
+
+    communication_thread.join()
 
 
 if __name__ == '__main__':
