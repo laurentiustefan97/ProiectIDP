@@ -26,4 +26,17 @@ services:
             - mqtt-broker
         networks:
             - broker-communication
+        # REMOVE ME
         tty: true
+
+    database:
+        image: mysql:5.7
+        volumes:
+            - ./database:/docker-entrypoint-initdb.d/:ro
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: expenditure_db
+            MYSQL_USER: my_user
+            MYSQL_PASSWORD: my_password
+        ports:
+            - "32000:3306"
