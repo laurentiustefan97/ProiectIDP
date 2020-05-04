@@ -87,25 +87,13 @@ def add_expenditure():
         ' VALUES (%s, %s, %s, %s, %s, %s)')
 
     print('Introduce the product category')
-    while True:
-        category = input()
-
-        if category.isalpha():
-            break
-
-        print('Category must contain only letters!')
+    category = input()
 
     print('Introduce the user name')
     username = input()
 
     print('Introduce the product name')
-    while True:
-        product_name = input()
-
-        if product_name.isalpha():
-            break
-
-        print('Product name must contain only letters!')
+    product_name = input()
 
     print('Introduce the product price')
     while True:
