@@ -4,6 +4,7 @@ networks:
     broker-communication:
     admin-db:
     admin-server:
+    visual-db:
 
 services:
     mqtt-broker:
@@ -28,6 +29,7 @@ services:
         depends_on:
             - mqtt-broker
             - admin
+        restart: on-failure
         networks:
             - broker-communication
             - admin-server
@@ -60,3 +62,18 @@ services:
             - "32000:3306"
         networks:
             - admin-db
+            - visual-db
+
+    visualizer:
+        image: grafana/grafana:latest
+        volumes:
+            - grafana_data:/var/lib/grafana
+        networks:
+            - visual-db
+        ports:
+            - 80:3000
+        depends_on:
+            - database
+
+volumes:
+    grafana_data: {}

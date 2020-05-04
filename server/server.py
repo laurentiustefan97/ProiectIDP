@@ -68,9 +68,6 @@ def connect_socket():
 
 
 def main():
-    # TODO change the sleep
-    time.sleep(3)
-
     # Connect to the admin service
     connect_socket()
 
