@@ -43,6 +43,8 @@ def create_listen_socket():
 
 # Listener thread function
 def accept_connection(listen_sock):
+    global db_connection, db_cursor
+
     admin_sock, admin_addr = listen_sock.accept()
 
     print('[LISTENER_THREAD]: Connected to address ' + str(admin_addr))
@@ -57,6 +59,24 @@ def accept_connection(listen_sock):
         json_payload = json.loads(json_payload)
 
         print('[LISTENER_THREAD]: Received the payload ' + str(json_payload))
+
+        add_new_expenditure = (
+            'INSERT INTO expenditures (username, category, product_name, product_price, product_date, description)'
+            ' VALUES (%s, %s, %s, %s, %s, %s)')
+
+        category = json_payload['category']
+        username = json_payload['username']
+        product_name = json_payload['product_name']
+        product_price = json_payload['product_price']
+        description = json_payload['description']
+
+        data_expenditure = (category, username, product_name,
+                            product_price, datetime.now(), description)
+        db_cursor.execute(add_new_expenditure, data_expenditure)
+
+        db_connection.commit()
+
+        print('Inserted successfully!')
 
 
 def add_expenditure():
@@ -99,17 +119,30 @@ def add_expenditure():
     print('Introduce the expenditure description')
     description = input()
 
-    now = datetime.now()
-    now = now.strftime('%Y-%m-%d %H:%M:%S')
-    # date = now.date().isoformat()
-
     data_expenditure = (category, username, product_name,
-                        product_price, now, description)
+                        product_price, datetime.now(), description)
     db_cursor.execute(add_new_expenditure, data_expenditure)
 
     db_connection.commit()
 
     print('Inserted successfully!')
+
+
+def delete_expenditure():
+    global db_connection, db_cursor
+
+    delete_expenditure = 'DELETE FROM expenditures where ID = %s'
+
+    print('Introduce the expenditure ID: ')
+    ID = input()
+
+    print()
+
+    db_cursor.execute(delete_expenditure, (ID,))
+
+    db_connection.commit()
+
+    print('Deleted successfully!')
 
 
 def list_expenditures():
@@ -167,11 +200,13 @@ def main():
 
         if operation == '1':
             add_expenditure()
+        if operation == '2':
+            delete_expenditure()
         elif operation == '3':
             list_expenditures()
         elif operation == '4':
             break
- 
+
     communication_thread.join()
 
 
