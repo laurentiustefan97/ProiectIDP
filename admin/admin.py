@@ -41,11 +41,12 @@ def create_listen_socket():
     return listen_sock
 
 
+# Listener thread function
 def accept_connection(listen_sock):
     admin_sock, admin_addr = listen_sock.accept()
 
-    print('Connected to address ' + str(admin_addr))
-    print('Waiting for requests...')
+    print('[LISTENER_THREAD]: Connected to address ' + str(admin_addr))
+    print('[LISTENER_THREAD]: Waiting for requests...')
 
     while True:
         # We only receive packages as jsons
@@ -55,7 +56,7 @@ def accept_connection(listen_sock):
 
         json_payload = json.loads(json_payload)
 
-        print('Received the payload ' + str(json_payload))
+        print('[LISTENER_THREAD]: Received the payload ' + str(json_payload))
 
 
 def add_expenditure():
@@ -98,8 +99,12 @@ def add_expenditure():
     print('Introduce the expenditure description')
     description = input()
 
+    now = datetime.now()
+    now = now.strftime('%Y-%m-%d %H:%M:%S')
+    # date = now.date().isoformat()
+
     data_expenditure = (category, username, product_name,
-                        product_price, datetime.now(), description)
+                        product_price, now, description)
     db_cursor.execute(add_new_expenditure, data_expenditure)
 
     db_connection.commit()
@@ -126,7 +131,7 @@ def list_expenditures():
     for (ID, username, category, product_name, product_price, product_date, description) in query_result:
         print('{0: <20}'.format(ID) + '{0: <20}'.format(username) + '{0: <20}'.format(category) +
               '{0: <20}'.format(product_name) + '{0: <20}'.format(product_price) +
-              '{0: <20}'.format(product_date) + '{0: <20}'.format(description))
+              '{0: <20}'.format(str(product_date)) + '{0: <20}'.format(description))
 
 
 def main():
@@ -141,7 +146,8 @@ def main():
     db_connect()
 
     communication_thread = threading.Thread(
-        target=accept_connection, args=listen_sock)
+        target=accept_connection, args=(listen_sock,))
+    communication_thread.start()
 
     print('--------------------------------------------------------')
     print('Welcome to the expenditure database administration!')
@@ -165,7 +171,7 @@ def main():
             list_expenditures()
         elif operation == '4':
             break
-
+ 
     communication_thread.join()
 
 

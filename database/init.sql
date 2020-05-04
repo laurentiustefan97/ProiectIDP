@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS expenditures (
   category VARCHAR(50),
   product_name VARCHAR(50),
   product_price INT,
-  product_date DATE,
+  product_date DATETIME,
   description VARCHAR(200),
   PRIMARY KEY (ID)
 );
