@@ -2,6 +2,7 @@ import mysql.connector
 import socket
 import json
 import threading
+from datetime import datetime
 
 # Constants
 
@@ -57,6 +58,77 @@ def accept_connection(listen_sock):
         print('Received the payload ' + str(json_payload))
 
 
+def add_expenditure():
+    global db_connection, db_cursor
+
+    add_new_expenditure = (
+        'INSERT INTO expenditures (username, category, product_name, product_price, product_date, description)'
+        ' VALUES (%s, %s, %s, %s, %s, %s)')
+
+    print('Introduce the product category')
+    while True:
+        category = input()
+
+        if category.isalpha():
+            break
+
+        print('Category must contain only letters!')
+
+    print('Introduce the user name')
+    username = input()
+
+    print('Introduce the product name')
+    while True:
+        product_name = input()
+
+        if product_name.isalpha():
+            break
+
+        print('Product name must contain only letters!')
+
+    print('Introduce the product price')
+    while True:
+        product_price = input()
+
+        if product_price.isdigit():
+            break
+
+        print('Product price should contain only digits!')
+
+    print('Introduce the expenditure description')
+    description = input()
+
+    data_expenditure = (category, username, product_name,
+                        product_price, datetime.now(), description)
+    db_cursor.execute(add_new_expenditure, data_expenditure)
+
+    db_connection.commit()
+
+    print('Inserted successfully!')
+
+
+def list_expenditures():
+    global db_connection, db_cursor
+
+    query = ('SELECT * FROM expenditures')
+
+    db_cursor.execute(query)
+
+    query_result = [(ID, username, category, product_name, product_price, product_date, description)
+                    for (ID, username, category, product_name, product_price, product_date, description)
+                    in db_cursor]
+
+    print('\nExpenditures')
+    print('{0: <20}'.format('ID') + '{0: <20}'.format('username') + '{0: <20}'.format('category') +
+          '{0: <20}'.format('product_name') + '{0: <20}'.format('product_price') +
+          '{0: <20}'.format('product_date') + '{0: <20}'.format('description'))
+
+    for (ID, username, category, product_name, product_price, product_date, description) in query_result:
+        print('{0: <20}'.format(ID) + '{0: <20}'.format(username) + '{0: <20}'.format(category) +
+              '{0: <20}'.format(product_name) + '{0: <20}'.format(product_price) +
+              '{0: <20}'.format(product_date) + '{0: <20}'.format(description))
+
+
 def main():
     global db_connection, db_cursor
 
@@ -68,7 +140,8 @@ def main():
 
     db_connect()
 
-    communication_thread = threading.Thread(target=accept_connection, args=listen_sock)
+    communication_thread = threading.Thread(
+        target=accept_connection, args=listen_sock)
 
     print('--------------------------------------------------------')
     print('Welcome to the expenditure database administration!')
@@ -86,9 +159,12 @@ def main():
 
         operation = input()
 
-        if operation == '4':
+        if operation == '1':
+            add_expenditure()
+        elif operation == '3':
+            list_expenditures()
+        elif operation == '4':
             break
-
 
     communication_thread.join()
 

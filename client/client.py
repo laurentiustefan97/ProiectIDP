@@ -55,11 +55,6 @@ def add_expenditure(mqtt_client):
 
         print('Product price should contain only digits!')
 
-    # Later TODO modify the date format in order
-    # to be consistent with the DB format
-    print('Introduce the expenditure date')
-    date = input()
-
     print('Introduce the expenditure description')
     description = input()
 
@@ -69,7 +64,6 @@ def add_expenditure(mqtt_client):
         'username': username,
         'product_name': product_name,
         'product_price': product_price,
-        'date': date,
         'description': description,
     }
 
