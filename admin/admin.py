@@ -47,13 +47,13 @@ def add_expenditure_remote(json_payload):
         'INSERT INTO expenditures (username, category, product_name, product_price, product_date, description)'
         ' VALUES (%s, %s, %s, %s, %s, %s)')
 
-    category = json_payload['category']
     username = json_payload['username']
+    category = json_payload['category']
     product_name = json_payload['product_name']
     product_price = json_payload['product_price']
     description = json_payload['description']
 
-    data_expenditure = (category, username, product_name,
+    data_expenditure = (username, category, product_name,
                         product_price, datetime.now(), description)
     db_cursor.execute(add_new_expenditure, data_expenditure)
 
@@ -105,11 +105,11 @@ def add_expenditure():
         'INSERT INTO expenditures (username, category, product_name, product_price, product_date, description)'
         ' VALUES (%s, %s, %s, %s, %s, %s)')
 
-    print('Introduce the product category')
-    category = input()
-
     print('Introduce the user name')
     username = input()
+
+    print('Introduce the product category')
+    category = input()
 
     print('Introduce the product name')
     product_name = input()
@@ -126,7 +126,7 @@ def add_expenditure():
     print('Introduce the expenditure description')
     description = input()
 
-    data_expenditure = (category, username, product_name,
+    data_expenditure = (username, category, product_name,
                         product_price, datetime.now(), description)
     db_cursor.execute(add_new_expenditure, data_expenditure)
 
