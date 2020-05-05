@@ -80,6 +80,9 @@ def connect_socket():
 
 
 def main():
+    # Synchronize with the admin service
+    time.sleep(5)
+
     # Connect to the admin service
     connect_socket()
 

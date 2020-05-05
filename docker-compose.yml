@@ -28,7 +28,6 @@ services:
         depends_on:
             - mqtt-broker
             - admin
-        restart: on-failure
         networks:
             - broker-communication
             - admin-server
