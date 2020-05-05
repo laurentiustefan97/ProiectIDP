@@ -2,6 +2,8 @@ import paho.mqtt.client as mqtt
 import socket
 import json
 
+username = None
+
 
 def on_connect(client, userdata, flags, rc):
     print('Connected with result code ' + str(rc))
@@ -25,11 +27,10 @@ def connect_mqtt_broker(mqtt_client):
 
 
 def add_expenditure(mqtt_client):
+    global username
+
     print('Introduce the product category')
     category = input()
-
-    print('Introduce the user name')
-    username = input()
 
     print('Introduce the product name')
     product_name = input()
@@ -48,6 +49,7 @@ def add_expenditure(mqtt_client):
 
     # Create a dictionary with the data received
     payload = {
+        'operation': 'add',
         'category': category,
         'username': username,
         'product_name': product_name,
@@ -60,7 +62,27 @@ def add_expenditure(mqtt_client):
     mqtt_client.publish('expenditure/add', json.dumps(payload))
 
 
+def delete_expenditure(mqtt_client):
+    global username
+
+    print('Introduce the product ID')
+    ID = input()
+
+    # Create a dictionary with the data received
+    payload = {
+        'operation': 'delete',
+        'username': username,
+        'ID': ID,
+    }
+
+    # Send over the broker on the /delete channel
+    # a JSON with the data received as a dictionary
+    mqtt_client.publish('expenditure/delete', json.dumps(payload))
+
+
 def main():
+    global username
+
     mqtt_client = init_mqtt_client()
 
     connect_mqtt_broker(mqtt_client)
@@ -69,6 +91,8 @@ def main():
 
     print('Press any key to start!')
     input()
+    print('Introduce your username')
+    username = input()
 
     print('--------------------------------------------------------')
     print('Welcome to the IDP Expenditure Evidence Service!')
@@ -79,8 +103,9 @@ def main():
         print('----------------------------------------------------')
         print('Introduce the desired operation:')
         print('[1]: Add an expenditure')
-        print('[2]: Exit the IDP Expenditure Evidence Service!')
-        print('[x]: More soon!')
+        print('[2]: Delete an expenditure')
+        print('[3]: List your expenditures')
+        print('[4]: Exit the IDP Expenditure Evidence Service!')
         print('----------------------------------------------------')
 
         operation = input()
@@ -88,6 +113,8 @@ def main():
         if operation == '1':
             add_expenditure(mqtt_client)
         elif operation == '2':
+            delete_expenditure(mqtt_client)
+        elif operation == '4':
             break
 
 

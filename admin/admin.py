@@ -20,7 +20,6 @@ db_cursor = None
 def db_connect():
     global db_connection, db_cursor
 
-    # TODO environment variables for the database credentials
     db_connection = mysql.connector.connect(user='root',
                                             password='root',
                                             host='database',
@@ -41,10 +40,43 @@ def create_listen_socket():
     return listen_sock
 
 
-# Listener thread function
-def accept_connection(listen_sock):
+def add_expenditure_remote(json_payload):
     global db_connection, db_cursor
 
+    add_new_expenditure = (
+        'INSERT INTO expenditures (username, category, product_name, product_price, product_date, description)'
+        ' VALUES (%s, %s, %s, %s, %s, %s)')
+
+    category = json_payload['category']
+    username = json_payload['username']
+    product_name = json_payload['product_name']
+    product_price = json_payload['product_price']
+    description = json_payload['description']
+
+    data_expenditure = (category, username, product_name,
+                        product_price, datetime.now(), description)
+    db_cursor.execute(add_new_expenditure, data_expenditure)
+
+    db_connection.commit()
+
+    print('Inserted successfully!')
+
+
+def delete_expenditure_remote(json_payload):
+    global db_connection, db_cursor
+
+    delete_expenditure = 'DELETE FROM expenditures WHERE ID = %s AND username = %s'
+
+    db_cursor.execute(delete_expenditure,
+                      (json_payload['ID'], json_payload['username']))
+
+    db_connection.commit()
+
+    print('Deleted successfully!')
+
+
+# Listener thread function
+def accept_connection(listen_sock):
     admin_sock, admin_addr = listen_sock.accept()
 
     print('[LISTENER_THREAD]: Connected to address ' + str(admin_addr))
@@ -56,27 +88,14 @@ def accept_connection(listen_sock):
         if not json_payload:
             break
 
-        json_payload = json.loads(json_payload)
-
         print('[LISTENER_THREAD]: Received the payload ' + str(json_payload))
 
-        add_new_expenditure = (
-            'INSERT INTO expenditures (username, category, product_name, product_price, product_date, description)'
-            ' VALUES (%s, %s, %s, %s, %s, %s)')
+        json_payload = json.loads(json_payload)
 
-        category = json_payload['category']
-        username = json_payload['username']
-        product_name = json_payload['product_name']
-        product_price = json_payload['product_price']
-        description = json_payload['description']
-
-        data_expenditure = (category, username, product_name,
-                            product_price, datetime.now(), description)
-        db_cursor.execute(add_new_expenditure, data_expenditure)
-
-        db_connection.commit()
-
-        print('Inserted successfully!')
+        if json_payload['operation'] == 'add':
+            add_expenditure_remote(json_payload)
+        elif json_payload['operation'] == 'delete':
+            delete_expenditure_remote(json_payload)
 
 
 def add_expenditure():
@@ -119,7 +138,7 @@ def add_expenditure():
 def delete_expenditure():
     global db_connection, db_cursor
 
-    delete_expenditure = 'DELETE FROM expenditures where ID = %s'
+    delete_expenditure = 'DELETE FROM expenditures WHERE ID = %s'
 
     print('Introduce the expenditure ID: ')
     ID = input()

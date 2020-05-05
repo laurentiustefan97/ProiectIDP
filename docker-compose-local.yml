@@ -23,7 +23,6 @@ services:
         tty: true
         stdin_open: true
 
-    # TODO solve dependency to admin
     server:
         build: ./server
         depends_on:
@@ -33,10 +32,8 @@ services:
         networks:
             - broker-communication
             - admin-server
-        # REMOVE ME
         tty: true
 
-    # TODO solve dependency to database
     admin:
         build: ./admin
         depends_on:

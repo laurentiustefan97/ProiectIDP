@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import socket
 import time
+import json
 
 # Constants
 
@@ -23,6 +24,15 @@ def process_add(payload):
     print('The operation received is add!')
     print('The payload is ' + str(payload))
 
+    admin_sock.send(payload)
+
+
+def process_delete(payload):
+    global admin_sock
+
+    print('The operation received is delete!')
+    print('The payload is ' + str(payload))
+
     # Sending the json string to the admin
     admin_sock.send(payload)
 
@@ -37,6 +47,8 @@ def on_message(mqtt_client, userdata, msg):
     # Process the requested operation
     if operation == 'add':
         process_add(msg.payload)
+    elif operation == 'delete':
+        process_delete(msg.payload)
 
 
 def init_mqtt_client():
