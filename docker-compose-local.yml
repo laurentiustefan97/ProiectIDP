@@ -64,13 +64,10 @@ services:
     visualizer:
         image: grafana/grafana:latest
         volumes:
-            - grafana_data:/var/lib/grafana
+            - ./grafana_data:/var/lib/grafana
         networks:
             - visual-db
         ports:
             - 80:3000
         depends_on:
             - database
-
-volumes:
-    grafana_data: {}
