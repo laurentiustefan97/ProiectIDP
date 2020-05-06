@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 import socket
+import time
 import json
 
 username = None
@@ -82,6 +83,9 @@ def delete_expenditure(mqtt_client):
 
 def main():
     global username
+
+    # Synchronize with the other services
+    time.sleep(20)
 
     mqtt_client = init_mqtt_client()
 
