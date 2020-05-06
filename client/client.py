@@ -104,8 +104,7 @@ def main():
         print('Introduce the desired operation:')
         print('[1]: Add an expenditure')
         print('[2]: Delete an expenditure')
-        print('[3]: List your expenditures')
-        print('[4]: Exit the IDP Expenditure Evidence Service!')
+        print('[3]: Exit the IDP Expenditure Evidence Service!')
         print('----------------------------------------------------')
 
         operation = input()
@@ -114,7 +113,7 @@ def main():
             add_expenditure(mqtt_client)
         elif operation == '2':
             delete_expenditure(mqtt_client)
-        elif operation == '4':
+        elif operation == '3':
             break
 
 
